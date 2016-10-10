@@ -207,27 +207,18 @@ public class PrintDrawable extends Drawable implements IPrint {
     @Override
     public void draw(Canvas canvas) {
         if (mIconText != null && !mInEditMode) {
-            final Rect bounds = getBounds();
-
-            mPaint.getTextPath(mIconText.toString(), 0, mIconText.length(), 0, bounds.height(), mPath);
-            mPath.computeBounds(mPathBounds, true);
-            offsetIcon(bounds);
-
-            mPath.close();
-            canvas.drawPath(mPath, mPaint);
+            Rect bounds = getBounds();
+            int height = bounds.height();
+            mPaint.setTextSize(height);
+            Rect textBounds = new Rect();
+            String textValue = String.valueOf(mIconText);
+            mPaint.getTextBounds(textValue, 0, 1, textBounds);
+            int textHeight = textBounds.height();
+            float textBottom = bounds.top + (height - textHeight) / 2f + textHeight - textBounds.bottom;
+            canvas.drawText(textValue, bounds.left, textBottom, mPaint);
         }
     }
-
-    private void offsetIcon(Rect bounds) {
-        float startX = bounds.centerX() - (mPathBounds.width() / 2);
-        float offsetX = startX - mPathBounds.left;
-
-        float startY = bounds.centerY() - (mPathBounds.height() / 2);
-        float offsetY = startY - (mPathBounds.top);
-
-        mPath.offset(offsetX, offsetY);
-    }
-
+    
     @Override
     public void setAlpha(int alpha) {
         mPaint.setAlpha(alpha);
